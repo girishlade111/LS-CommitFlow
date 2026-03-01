@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
         <div className="min-h-screen flex flex-col">
           <header className="border-b border-[#30363d] bg-[#161b22] p-4">
