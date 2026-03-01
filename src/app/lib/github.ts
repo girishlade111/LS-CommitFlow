@@ -4,8 +4,10 @@
  */
 
 import { Octokit } from "octokit";
+import { CATEGORY_SLUGS, MessageRotationEngine, getCommitMessages } from "../utils/templates";
 
 const EDUCATION_FILE = "edu-commit-log.txt";
+const COMMIT_DELAY_MS = 400; // 300-500ms delay between commits
 
 export interface CommitResult {
   sha: string;
@@ -23,7 +25,7 @@ export interface GitHubError {
 export function createOctokit(token?: string): Octokit {
   return new Octokit({
     auth: token,
-    userAgent: "Git-Commit-Tool/1.0.0",
+    userAgent: "Git-Commit-Tool/2.0.0",
   });
 }
 
@@ -36,6 +38,7 @@ export async function validateRepository(
   isArchived: boolean;
   isPrivate: boolean;
   defaultBranch: string;
+  isProtected: boolean;
   ownerLogin: string;
   permissions: string;
 }> {
@@ -43,6 +46,19 @@ export async function validateRepository(
     owner,
     repo,
   });
+
+  // Check if default branch is protected
+  let isProtected = false;
+  try {
+    const { data: branch } = await octokit.rest.repos.getBranch({
+      owner,
+      repo,
+      branch: repository.default_branch || "main",
+    });
+    isProtected = branch.protected || false;
+  } catch {
+    // Branch protection info not available
+  }
 
   let ownerLogin = owner;
   try {
@@ -57,6 +73,7 @@ export async function validateRepository(
     isArchived: repository.archived ?? false,
     isPrivate: repository.private ?? false,
     defaultBranch: repository.default_branch ?? "main",
+    isProtected,
     ownerLogin,
     permissions: repository.permissions ? 
       Object.entries(repository.permissions)
@@ -153,6 +170,11 @@ export async function generateEducationalCommits(
     throw { status: 403, message: "Cannot commit to archived repositories" } as GitHubError;
   }
 
+  // Warn if branch is protected
+  if (repoInfo.isProtected) {
+    console.warn(`Warning: Default branch '${repoInfo.defaultBranch}' is protected`);
+  }
+
   const branch = repoInfo.defaultBranch;
   const commits: CommitResult[] = [];
 
@@ -162,7 +184,7 @@ export async function generateEducationalCommits(
   // Build content - either append to existing or start fresh
   let fileContent = existingContent || "# Educational Commit Log\n\n";
 
-  // Create initial commit if file doesn't exist, or add a marker if it does
+  // Create initial commit if file doesn't exist
   if (!currentSha) {
     const result = await commitFile(
       octokit, owner, repo, branch,
@@ -176,7 +198,11 @@ export async function generateEducationalCommits(
   // Get fresh SHA for subsequent commits
   let { sha: latestSha } = await getCurrentFile(octokit, owner, repo, branch);
 
-  // Generate commits - get fresh SHA each time
+  // Get category slug and create message rotation engine
+  const categorySlug = CATEGORY_SLUGS[category as keyof typeof CATEGORY_SLUGS] || "web_development";
+  const messageEngine = new MessageRotationEngine(categorySlug);
+
+  // Generate commits with proper message rotation
   for (let i = 0; i < commitCount; i++) {
     onProgress?.(i + 1, commitCount);
 
@@ -185,20 +211,25 @@ export async function generateEducationalCommits(
     latestSha = fileData.sha;
     fileContent = fileData.content || "# Educational Commit Log\n\n";
 
+    // Get the next message from the rotation engine
+    const commitMessage = messageEngine.getNextMessage();
     const timestamp = new Date().toISOString();
-    fileContent += `\n---\nCommit ${i + 1}: Educational ${category} update\nTimestamp: ${timestamp}\n`;
+    
+    // Append to file content
+    fileContent += `\n---\nCommit ${i + 1}: ${commitMessage}\nTimestamp: ${timestamp}\n`;
 
     const result = await commitFile(
       octokit, owner, repo, branch,
       fileContent,
-      `Educational ${category} commit ${i + 1}/${commitCount}`,
+      commitMessage,
       latestSha
     );
 
     commits.push(result);
 
+    // Delay between commits (300-500ms)
     if (i < commitCount - 1) {
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise(resolve => setTimeout(resolve, COMMIT_DELAY_MS));
     }
   }
 

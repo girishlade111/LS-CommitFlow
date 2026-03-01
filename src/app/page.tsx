@@ -27,11 +27,13 @@ export default function Home() {
             />
           </svg>
           <div>
-            <h3 className="font-semibold text-[#d29922]">Educational Use Only</h3>
+            <h3 className="font-semibold text-[#d29922]">
+              Educational Git Automation Tool — Not for contribution manipulation
+            </h3>
             <p className="text-sm text-[#8b949e] mt-1">
-              This tool is designed for learning GitHub API automation. 
-              Do not use for manipulating contribution history or bypassing rate limits.
-              Respect GitHub's terms of service.
+              This tool is designed for learning GitHub API automation and understanding Git operations. 
+              Do not use for manipulating contribution history, bypassing rate limits, or any activity 
+              that violates GitHub's terms of service. Always respect the community guidelines.
             </p>
           </div>
         </div>

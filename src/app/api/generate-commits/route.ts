@@ -15,10 +15,9 @@ import {
   validateToken,
   validateCommitCount,
   validateCategory,
+  validateRequest,
+  MAX_COMMITS,
 } from "../../lib/validation";
-
-// Maximum commits allowed per request
-const MAX_COMMITS = 100;
 
 // Rate limiting - simple in-memory store (use Redis for production)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -44,54 +43,6 @@ function checkRateLimit(ip: string): boolean {
 
   record.count++;
   return true;
-}
-
-/**
- * Validate incoming request
- */
-function validateRequest(body: {
-  repoUrl: string;
-  token?: string;
-  commitCount: number;
-  category: string;
-}): {
-  isValid: boolean;
-  error?: string;
-} {
-  // Validate repository URL
-  const parsedRepo = parseRepoUrl(body.repoUrl);
-  if (!parsedRepo) {
-    return {
-      isValid: false,
-      error: "Invalid GitHub repository URL. Use format: owner/repo or https://github.com/owner/repo",
-    };
-  }
-
-  // Validate token if provided
-  if (body.token && !validateToken(body.token)) {
-    return {
-      isValid: false,
-      error: "Invalid GitHub token format",
-    };
-  }
-
-  // Validate commit count
-  if (!validateCommitCount(body.commitCount)) {
-    return {
-      isValid: false,
-      error: `Commit count must be between 1 and ${MAX_COMMITS}`,
-    };
-  }
-
-  // Validate category
-  if (!validateCategory(body.category)) {
-    return {
-      isValid: false,
-      error: "Invalid category. Must be one of: Study, IT, Marketplace",
-    };
-  }
-
-  return { isValid: true };
 }
 
 /**
@@ -126,7 +77,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate input
+    // Validate complete request
     const validation = validateRequest({
       repoUrl: body.repoUrl,
       token: body.token,
@@ -136,7 +87,11 @@ export async function POST(request: NextRequest) {
 
     if (!validation.isValid) {
       return NextResponse.json(
-        { error: validation.error },
+        { 
+          error: "Validation failed", 
+          details: validation.errors,
+          code: "VALIDATION_ERROR" 
+        },
         { status: 400 }
       );
     }
@@ -157,6 +112,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
+        categoryUsed: body.category,
         commits: commits.map((commit) => ({
           sha: commit.sha.substring(0, 7),
           message: commit.message,
@@ -166,6 +122,7 @@ export async function POST(request: NextRequest) {
         })),
         repository: `${parsedRepo.owner}/${parsedRepo.repo}`,
         totalCommits: commits.length,
+        warnings: validation.warnings,
       });
     } catch (genError) {
       console.error("Generate commits error:", genError);
@@ -260,16 +217,16 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     name: "Git Commit Tool API",
-    version: "1.0.0",
+    version: "2.0.0",
     description: "Educational GitHub API automation",
     endpoints: {
       POST: {
         path: "/api/generate-commits",
         body: {
           repoUrl: "string (required) - GitHub repository URL",
-          token: "string (optional) - GitHub Personal Access Token",
-          commitCount: "number (required) - Number of commits (1-100)",
-          category: "string (required) - Category: Study, IT, or Marketplace",
+          token: "string (required) - GitHub Personal Access Token",
+          commitCount: "number (required) - Number of commits (1-1000)",
+          category: "string (required) - Category from the list of available categories",
         },
       },
     },
@@ -280,6 +237,19 @@ export async function GET() {
         "Respect GitHub API rate limits",
         "Do not use for contribution manipulation",
       ],
+    },
+    categories: {
+      groups: [
+        "Business & Website Projects",
+        "Software Development",
+        "AI & Data",
+        "DevOps & Infrastructure",
+        "Security",
+        "Curated & Knowledge Repos",
+        "Emerging Tech",
+        "Repository Types",
+      ],
+      total: 47,
     },
   });
 }
