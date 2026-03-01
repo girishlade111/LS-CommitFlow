@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Git Commit Tool - Educational Git Automation",
-  description: "An educational tool for learning GitHub API automation. For educational purposes only.",
+  title: "Git Commit Tool",
+  description: "A tool for learning GitHub API automation.",
 };
 
 export default function RootLayout({
@@ -20,16 +20,13 @@ export default function RootLayout({
               <h1 className="text-xl font-semibold text-[#58a6ff]">
                 Git Commit Tool
               </h1>
-              <span className="text-xs text-[#d29922] bg-[#d29922]/10 px-2 py-1 rounded">
-                Educational Use Only
-              </span>
             </div>
           </header>
           <main className="flex-1">
             {children}
           </main>
           <footer className="border-t border-[#30363d] p-4 text-center text-sm text-[#8b949e]">
-            <p>Built for educational purposes. Respect GitHub API rate limits.</p>
+            <p>Built for learning GitHub API automation.</p>
           </footer>
         </div>
       </body>
