@@ -1,0 +1,351 @@
+@import "tailwindcss";
+
+/* Spotify Design Tokens - CSS Variables */
+:root {
+  /* Background Colors */
+  --bg-base: #121212;
+  --bg-base-high: #080808;
+  --bg-highlight: #1a1a1a;
+  --bg-highlight-high: #242424;
+  --bg-elevated-base: #242424;
+  --bg-elevated-high: #282828;
+  --bg-tinted: #1f1f1f;
+  --bg-tinted-high: #2a2a2a;
+  --bg-subdued: #3e3e3e;
+  --bg-card: #181818;
+  --bg-card-hover: #282828;
+
+  /* Text Colors */
+  --text-base: #ffffff;
+  --text-bright: #ffffff;
+  --text-subdued: #a7a7a7;
+  --text-faint: #6a6a6a;
+  --text-bright-accent: #ffffff;
+
+  /* Essential Colors */
+  --essential-base: #ffffff;
+  --essential-subdued: #727272;
+  --essential-bright: #ffffff;
+  --essential-error: #e91429;
+  --essential-error-bright: #ff5f6f;
+  --essential-warning: #e91429;
+  --essential-positive: #1db954;
+  --essential-notice: #1db954;
+
+  /* Green (Spotify Brand) */
+  --green: #1db954;
+  --green-hover: #1ed760;
+  --green-active: #169c46;
+  --green-bright: #1db954;
+  --green-link: #1db954;
+
+  /* Other Brand Colors */
+  --red: #e91429;
+  --orange: #dc148c;
+  --purple: #8c14dc;
+  --blue: #148cdc;
+  --turquoise: #14dcdc;
+
+  /* Transitions */
+  --transition-fast: 0.1s ease;
+  --transition-standard: 0.2s ease;
+  --transition-slow: 0.4s ease;
+
+  /* Border Radius */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-full: 9999px;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Font Sizes */
+  --font-size-xs: 11px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+  --font-size-3xl: 40px;
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Z-Index Scale */
+  --z-index-dropdown: 100;
+  --z-index-sticky: 200;
+  --z-index-fixed: 300;
+  --z-index-overlay-backdrop: 400;
+  --z-index-overlay: 500;
+  --z-index-modal: 600;
+  --z-index-popover: 700;
+  --z-index-tooltip: 800;
+  --z-index-toast: 900;
+}
+
+@theme inline {
+  --color-bg-base: var(--bg-base);
+  --color-bg-highlight: var(--bg-highlight);
+  --color-bg-elevated-base: var(--bg-elevated-base);
+  --color-bg-elevated-high: var(--bg-elevated-high);
+  --color-bg-tinted: var(--bg-tinted);
+  --color-text-base: var(--text-base);
+  --color-text-subdued: var(--text-subdued);
+  --color-text-faint: var(--text-faint);
+  --color-essential-base: var(--essential-base);
+  --color-essential-subdued: var(--essential-subdued);
+  --color-green: var(--green);
+  --color-green-hover: var(--green-hover);
+  --color-green-active: var(--green-active);
+  --color-spotify-green: #1db954;
+  --color-spotify-green-hover: #1ed760;
+  --color-spotify-green-active: #169c46;
+  --color-spotify-black: #121212;
+  --color-spotify-card: #181818;
+  --color-spotify-card-hover: #282828;
+  --color-spotify-elevated: #242424;
+  --color-spotify-highlight: #2a2a2a;
+  --color-spotify-white: #ffffff;
+  --color-spotify-subdued: #a7a7a7;
+  --color-spotify-faint: #727272;
+  --font-family-figtree: "Figtree", sans-serif;
+}
+
+/* Custom Scrollbar - Spotify Style */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+/* Thin scrollbar inside panels */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  border-width: 2px;
+}
+
+/* Custom Range Input (Slider) */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  background: #535353;
+  border-radius: 2px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+input[type="range"]:hover::-webkit-slider-runnable-track {
+  background: #b3b3b3;
+}
+
+/* Firefox range input styling */
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: #535353;
+  border-radius: 2px;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+input[type="range"]:hover::-moz-range-thumb {
+  opacity: 1;
+}
+
+input[type="range"]:hover::-moz-range-track {
+  background: #b3b3b3;
+}
+
+/* Keyframe Animations */
+@keyframes playingBar1 {
+  0%, 100% { height: 60%; }
+  25% { height: 100%; }
+  50% { height: 40%; }
+  75% { height: 80%; }
+}
+
+@keyframes playingBar2 {
+  0%, 100% { height: 80%; }
+  25% { height: 40%; }
+  50% { height: 100%; }
+  75% { height: 60%; }
+}
+
+@keyframes playingBar3 {
+  0%, 100% { height: 40%; }
+  25% { height: 80%; }
+  50% { height: 60%; }
+  75% { height: 100%; }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes toastSlide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Base Styles */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg-base);
+  color: var(--text-base);
+  font-family: var(--font-family-figtree), "Figtree", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Remove default button styles */
+button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+/* Remove default input styles */
+input,
+textarea {
+  font-family: inherit;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(29, 185, 84, 0.3);
+  color: var(--text-base);
+}
+
+/* Focus visible outline */
+:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* Utility class for hiding scrollbar but keeping functionality */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Equalizer animation classes */
+.equalizer-bar-1 {
+  animation: playingBar1 0.8s ease-in-out infinite;
+}
+
+.equalizer-bar-2 {
+  animation: playingBar2 0.8s ease-in-out infinite 0.2s;
+}
+
+.equalizer-bar-3 {
+  animation: playingBar3 0.8s ease-in-out infinite 0.4s;
+}
+
+/* Skeleton loading animation */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-highlight) 25%,
+    var(--bg-elevated-base) 50%,
+    var(--bg-highlight) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
